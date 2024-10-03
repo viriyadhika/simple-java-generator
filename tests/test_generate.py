@@ -2,6 +2,7 @@ import os
 from src.generator.generator.generate import (
     generate_attribute,
     generate_class,
+    generate_decorator,
     generate_file,
     generate_method,
     generate_method_parameter,
@@ -32,6 +33,12 @@ class TestGenerateMethod:
         assert (
             generate_method_parameter(MethodParameter("AbcLolol"))
             == "AbcLolol abcLolol"
+        )
+
+    def test_generate_decorator_list(self):
+        assert (
+            generate_decorator(Decorator("Decorator1", ["one", "two"]))
+            == "@Decorator1(one, two)"
         )
 
     def test_generate_method_parameter_with_decorator(self):

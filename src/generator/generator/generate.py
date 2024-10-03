@@ -15,6 +15,9 @@ from src.generator.objects.method_params import MethodParameter
 
 
 def generate_decorator(decorator: Decorator):
+    if isinstance(decorator.parameters, List):
+        return "@" + decorator.name + "(" + ", ".join(decorator.parameters) + ")"
+
     if len(decorator.parameters) == 0:
         return "@" + decorator.name
 
