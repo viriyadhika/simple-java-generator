@@ -94,14 +94,24 @@ def generate_attribute(attribute: Attribute):
     return generate_str_from_lines(__generate_attribute_lines(attribute))
 
 
+def _generate_class_header(cls: Class):
+    line = cls.cls_type.value + " " + cls.name + " "
+    if cls.extended_class != None:
+        line += f"extends {cls.extended_class} "
+    if len(cls.implemented_interfaces) > 0:
+        line += f"implements {','.join(cls.implemented_interfaces)} "
+
+    line += "{"
+    return line
+
+
 def generate_class(cls: Class):
     lines = []
 
     for decorator in cls.decorators:
-        print(decorator)
         lines.append(generate_decorator(decorator))
 
-    lines.append(cls.cls_type.value + " " + cls.name + " {")
+    lines.append(_generate_class_header(cls))
     lines.append("")
 
     for attribute in cls.attribute:
@@ -126,4 +136,10 @@ def generate_file(f: File):
         os.mkdir(f.path)
 
     with open(os.path.join(f.path, f.cls.name + ".java"), "w") as file:
-        file.write(generate_class(f.cls))
+        lines = []
+        if len(f.import_statements) > 0:
+            lines.append("\n".join(f.import_statements))
+            lines.append("")
+
+        lines.append(generate_class(f.cls))
+        file.write(generate_str_from_lines(lines))

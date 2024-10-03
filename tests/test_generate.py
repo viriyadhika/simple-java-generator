@@ -14,6 +14,17 @@ from src.generator.objects.file import File
 from src.generator.objects.method import Method
 from src.generator.objects.method_params import MethodParameter
 from src.generator.builder.class_builder import ClassBuilder
+import pytest
+
+
+@pytest.fixture
+def file_path_and_class_name():
+    yield ("./aa", "BigInteger")
+    try:
+        os.remove("./aa/BigInteger.java")
+        os.rmdir("./aa")
+    except Exception as ex:
+        print(f"Exception encountered {ex}")
 
 
 class TestGenerateMethod:
@@ -95,6 +106,28 @@ class TestGenerateMethod:
             == "class ClassName {\n\n  private BigInteger attrName;\n\n  public BigInteger blala(Param1 param1) {\n  \n  }\n\n  public BigInteger blala(Param1 param1) {\n  \n  }\n\n}"
         )
 
+    def test_generate_class_with_extends(self):
+        cls = ClassBuilder().add_name("ClassName").build()
+        cls.set_extended_class("ClassTwo")
+
+        assert generate_class(cls) == "class ClassName extends ClassTwo {\n\n}"
+
+    def test_generate_class_with_implement_(self):
+        cls = ClassBuilder().add_name("ClassName").build()
+        cls.add_interface("InterfaceOne")
+
+        assert generate_class(cls) == "class ClassName implements InterfaceOne {\n\n}"
+
+    def test_generate_class_with_implement_and_extends(self):
+        cls = ClassBuilder().add_name("ClassName").build()
+        cls.set_extended_class("ClassTwo")
+        cls.add_interface("InterfaceOne")
+
+        assert (
+            generate_class(cls)
+            == "class ClassName extends ClassTwo implements InterfaceOne {\n\n}"
+        )
+
     def test_generate_interface(self):
         interface = (
             ClassBuilder()
@@ -126,20 +159,30 @@ class TestGenerateMethod:
             == "@SpringBootTest(classes = Configuration.class)\ninterface BigInteger {\n\n  @Override\n  public BigInteger method1(Integer integer) {\n  \n  }\n\n}"
         )
 
-    def test_generate_file(self):
-        cls = ClassBuilder().add_name("BigInteger").build()
-        f = File(cls, "./aa")
-        try:
-            generate_file(f)
-            with open("./aa/BigInteger.java") as f:
-                result = []
-                for row in f:
-                    result.append(row)
+    def test_generate_file(self, file_path_and_class_name):
+        file_path, class_name = file_path_and_class_name
+        cls = ClassBuilder().add_name(class_name).build()
+        f = File(cls, file_path)
+        generate_file(f)
+        with open(file_path + "/" + class_name + ".java") as f:
+            result = []
+            for row in f:
+                result.append(row)
 
-                assert "".join(result) == "class BigInteger {\n\n}"
-        finally:
-            try:
-                os.remove("./aa/BigInteger.java")
-                os.rmdir("./aa")
-            except Exception as ex:
-                print(f"Exception encountered {ex}")
+            assert "".join(result) == "class BigInteger {\n\n}"
+
+    def test_generate_file_with_import(self, file_path_and_class_name):
+        file_path, class_name = file_path_and_class_name
+        cls = ClassBuilder().add_name(class_name).build()
+        f = File(cls, file_path)
+        f.add_import_statement("import com.xxx.yyy.ClassName")
+        generate_file(f)
+        with open(file_path + "/" + class_name + ".java") as f:
+            result = []
+            for row in f:
+                result.append(row)
+
+            assert (
+                "".join(result)
+                == "import com.xxx.yyy.ClassName\n\nclass BigInteger {\n\n}"
+            )
