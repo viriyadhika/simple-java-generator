@@ -54,7 +54,7 @@ class TestGenerateMethod:
         m.add_decorator(Decorator("DecoratorName", {}))
         assert (
             generate_method(m)
-            == """    @DecoratorName\n    public BigInteger blalala() {\n    \n    }"""
+            == """\t\t\t\t@DecoratorName\n\t\t\t\tpublic BigInteger blalala() {\n\t\t\t\t\n\t\t\t\t}"""
         )
 
     def test_generate_attribute(self):
@@ -70,7 +70,9 @@ class TestGenerateMethod:
         attr = Attribute("attributeA", "BigInteger")
         attr.add_decorator(Decorator("DecoratorName", {}))
         attr.set_indent(1)
-        assert generate_attribute(attr) == "  @DecoratorName\n  BigInteger attributeA;"
+        assert (
+            generate_attribute(attr) == "\t\t@DecoratorName\n\t\tBigInteger attributeA;"
+        )
 
     def test_generate_class(self):
         cls = ClassBuilder().add_name("ClassName").build()
@@ -103,7 +105,7 @@ class TestGenerateMethod:
 
         assert (
             generate_class(cls)
-            == "class ClassName {\n\n  private BigInteger attrName;\n\n  public BigInteger blala(Param1 param1) {\n  \n  }\n\n  public BigInteger blala(Param1 param1) {\n  \n  }\n\n}"
+            == "class ClassName {\n\n\t\tprivate BigInteger attrName;\n\n\t\tpublic BigInteger blala(Param1 param1) {\n\t\t\n\t\t}\n\n\t\tpublic BigInteger blala(Param1 param1) {\n\t\t\n\t\t}\n\n}"
         )
 
     def test_generate_class_with_extends(self):
@@ -156,7 +158,7 @@ class TestGenerateMethod:
 
         assert (
             generate_class(interface)
-            == "@SpringBootTest(classes = Configuration.class)\ninterface BigInteger {\n\n  @Override\n  public BigInteger method1(Integer integer) {\n  \n  }\n\n}"
+            == "@SpringBootTest(classes = Configuration.class)\ninterface BigInteger {\n\n\t\t@Override\n\t\tpublic BigInteger method1(Integer integer) {\n\t\t\n\t\t}\n\n}"
         )
 
     def test_generate_file(self, file_path_and_class_name):

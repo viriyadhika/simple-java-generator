@@ -5,11 +5,8 @@ def pascal_to_camel_case(st: str):
     return st[0].lower() + st[1:]
 
 
-size = 2
-
-
 def __get_indent(indentation: int):
-    return " " * size * indentation
+    return "\t" * 2 * indentation
 
 
 def generate_indented(indent: int, lines: List[str]):
