@@ -54,6 +54,16 @@ class TestGenerateMethod:
         m = Method(AccessModifier.PUBLIC, "blalala", "BigInteger", params)
         assert generate_method(m) == """public BigInteger blalala() {\n\n}"""
 
+    def test_generate_method_with_body(self):
+        params = []
+        m = Method(AccessModifier.PUBLIC, "blalala", "BigInteger", params)
+        m.set_body(['return new BigInteger("5");'])
+
+        assert (
+            generate_method(m)
+            == 'public BigInteger blalala() {\n\t\treturn new BigInteger("5");\n}'
+        )
+
     def test_generate_method_with_indentation_and_decorator(self):
         params = []
         m = Method(AccessModifier.PUBLIC, "blalala", "BigInteger", params)
@@ -84,7 +94,7 @@ class TestGenerateMethod:
     def test_generate_class(self):
         cls = ClassBuilder().add_name("ClassName").build()
 
-        assert generate_class(cls) == "class ClassName {\n\n}"
+        assert generate_class(cls) == "public class ClassName {\n\n}"
 
     def test_generate_class_with_method(self):
         cls = (
@@ -112,20 +122,23 @@ class TestGenerateMethod:
 
         assert (
             generate_class(cls)
-            == "class ClassName {\n\n\t\tprivate BigInteger attrName;\n\n\t\tpublic BigInteger blala(Param1 param1) {\n\t\t\n\t\t}\n\n\t\tpublic BigInteger blala(Param1 param1) {\n\t\t\n\t\t}\n\n}"
+            == "public class ClassName {\n\n\t\tprivate BigInteger attrName;\n\n\t\tpublic BigInteger blala(Param1 param1) {\n\t\t\n\t\t}\n\n\t\tpublic BigInteger blala(Param1 param1) {\n\t\t\n\t\t}\n\n}"
         )
 
     def test_generate_class_with_extends(self):
         cls = ClassBuilder().add_name("ClassName").build()
         cls.set_extended_class("ClassTwo")
 
-        assert generate_class(cls) == "class ClassName extends ClassTwo {\n\n}"
+        assert generate_class(cls) == "public class ClassName extends ClassTwo {\n\n}"
 
     def test_generate_class_with_implement_(self):
         cls = ClassBuilder().add_name("ClassName").build()
         cls.add_interface("InterfaceOne")
 
-        assert generate_class(cls) == "class ClassName implements InterfaceOne {\n\n}"
+        assert (
+            generate_class(cls)
+            == "public class ClassName implements InterfaceOne {\n\n}"
+        )
 
     def test_generate_class_with_implement_and_extends(self):
         cls = ClassBuilder().add_name("ClassName").build()
@@ -134,7 +147,7 @@ class TestGenerateMethod:
 
         assert (
             generate_class(cls)
-            == "class ClassName extends ClassTwo implements InterfaceOne {\n\n}"
+            == "public class ClassName extends ClassTwo implements InterfaceOne {\n\n}"
         )
 
     def test_generate_interface(self):
@@ -145,7 +158,7 @@ class TestGenerateMethod:
             .build()
         )
 
-        assert generate_class(interface) == "interface BigInteger {\n\n}"
+        assert generate_class(interface) == "public interface BigInteger {\n\n}"
 
     def test_generate_interface_with_decorator(self):
         m = Method(
@@ -165,7 +178,7 @@ class TestGenerateMethod:
 
         assert (
             generate_class(interface)
-            == "@SpringBootTest(classes = Configuration.class)\ninterface BigInteger {\n\n\t\t@Override\n\t\tpublic BigInteger method1(Integer integer) {\n\t\t\n\t\t}\n\n}"
+            == "@SpringBootTest(classes = Configuration.class)\npublic interface BigInteger {\n\n\t\t@Override\n\t\tpublic BigInteger method1(Integer integer) {\n\t\t\n\t\t}\n\n}"
         )
 
     def test_generate_file(self, file_path_and_class_name):
@@ -178,7 +191,7 @@ class TestGenerateMethod:
             for row in f:
                 result.append(row)
 
-            assert "".join(result) == "class BigInteger {\n\n}"
+            assert "".join(result) == "public class BigInteger {\n\n}"
 
     def test_generate_file_with_import(self, file_path_and_class_name):
         file_path, class_name = file_path_and_class_name
@@ -193,5 +206,5 @@ class TestGenerateMethod:
 
             assert (
                 "".join(result)
-                == "import com.xxx.yyy.ClassName\n\nclass BigInteger {\n\n}"
+                == "import com.xxx.yyy.ClassName\n\npublic class BigInteger {\n\n}"
             )

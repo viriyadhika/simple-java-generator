@@ -62,7 +62,12 @@ def __generate_method_lines(method: Method):
         + ") "
         + "{"
     )
-    lines.append("")
+    if len(method.body) == 0:
+        lines.append("")
+    else:
+        for body_line in generate_indented(1, method.body):
+            lines.append(body_line)
+
     lines.append("}")
 
     return generate_indented(method.indentation, lines)
@@ -98,7 +103,7 @@ def generate_attribute(attribute: Attribute):
 
 
 def _generate_class_header(cls: Class):
-    line = cls.cls_type.value + " " + cls.name + " "
+    line = "public " + cls.cls_type.value + " " + cls.name + " "
     if cls.extended_class != None:
         line += f"extends {cls.extended_class} "
     if len(cls.implemented_interfaces) > 0:

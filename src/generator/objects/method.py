@@ -15,10 +15,19 @@ class Method(Decoratorable, Indentable):
         name: str,
         return_type: str,
         parameters: List[MethodParameter],
+        body=None,
     ) -> None:
+
+        if body is None:
+            body = []
+
         Decoratorable.__init__(self)
         Indentable.__init__(self)
         self.access_modifier = access_modifier
         self.name = name
         self.return_type = return_type
         self.parameters = parameters
+        self.body = body
+
+    def set_body(self, body: List[str]):
+        self.body = body
